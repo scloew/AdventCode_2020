@@ -105,6 +105,33 @@ def day_4b():
     return ret
 
 
+def day_5a():
+    return max(day_5_seat_helper())
+
+
+def day_5b():
+    get_id = lambda r, c: r * 8 + c
+    available_seats = {get_id(r, c) for r in range(1, 127) for c in range(8)}
+    taken_seats = set(day_5_seat_helper())
+    empty_seats = available_seats - taken_seats
+    for i in empty_seats:
+        if i in range(13, 1018) and i-1 in taken_seats and i+1 in taken_seats:
+            return i
+
+
+def day_5_seat_helper():
+    data = fetch_input('day_5.txt').split('\n')[:-1]
+    args_r, args_c = ('B', 'F'), ('R', 'L')
+    for entry in data:
+        row, column = entry[:7], entry[7:]
+        yield day_5_helper(row, *args_r) * 8 + day_5_helper(column, *args_c)
+
+
+def day_5_helper(string, one, zero):
+    temp = string.replace(one, '1').replace(zero, '0')
+    return int(temp, 2)
+
+
 if __name__ == '__main__':
     print('1A := ', day_1a())
     print('1B := ', day_1b())
@@ -114,3 +141,5 @@ if __name__ == '__main__':
     print('3B := ', day_3b())
     print('4A := ', day_4a())
     print('4B := ', day_4b())
+    print('5A := ', day_5a())
+    print('5B := ', day_5b())
