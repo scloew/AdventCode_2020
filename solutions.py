@@ -1,12 +1,12 @@
 from collections import namedtuple
 from operator import mul
 from functools import reduce
+from collections import Counter
 
 
 def fetch_input(file_name):
     with open(r'inputs/' + file_name, 'r') as in_file:
-        data = in_file.read()
-    return data
+        return in_file.read()
 
 
 def day_1a(target=2020, data=None):
@@ -132,6 +132,24 @@ def day_5_helper(string, one, zero):
     return int(temp, 2)
 
 
+def day_6a():
+    data = fetch_input('day_6.txt').split('\n\n')
+    return sum(len(set(entry.replace('\n', ''))) for entry in data)
+
+
+def day_6b():
+    data = fetch_input('day_6.txt').split('\n\n')
+    data = [i.split('\n') for i in data]
+    data[-1] = data[-1][:-1]
+    total = 0
+    for group in data:
+        group_size = len(group)
+        counts = Counter(''.join(group))
+        counts = Counter(counts.values())[group_size]
+        total += counts
+    return total
+
+
 if __name__ == '__main__':
     print('1A := ', day_1a())
     print('1B := ', day_1b())
@@ -143,3 +161,5 @@ if __name__ == '__main__':
     print('4B := ', day_4b())
     print('5A := ', day_5a())
     print('5B := ', day_5b())
+    print('6A := ', day_6a())
+    print('6B := ', day_6b())
