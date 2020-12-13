@@ -150,6 +150,39 @@ def day_6b():
     return total
 
 
+def day_7a():
+    Edge = namedtuple('Edge', ['weight', 'vertex'])
+    data = fetch_input('day_7.txt').replace('.', '').replace(' no other bags', '').replace('bags', 'bag').split('\n')[:-1]
+    graph = {}
+    for entry in data:
+        if entry.count('bag') == 1:
+            continue
+        temp = entry.split(' contain ')
+        bag, content = temp[0], temp[1].split(', ')
+        for item in content:
+            temp = item.split(' ')
+            wght, temp_bag = temp[0], ' '.join(temp[1:])
+            temp_list = graph.get(temp_bag, [])
+            temp_list.append(Edge(wght, bag))
+            graph[temp_bag] = temp_list
+    return len(bfs(graph))-1
+
+
+def bfs(graph, start_node='shiny gold bag'):
+    new_nodes, observed = [start_node], set()
+    while new_nodes:
+        temp_nodes = []
+        for node in new_nodes:
+            observed.add(node)
+            if node not in graph.keys():
+                continue
+            for wght, vertex in graph[node]:
+                if vertex not in observed:
+                    temp_nodes.append(vertex)
+        new_nodes = temp_nodes
+    return observed
+
+
 if __name__ == '__main__':
     print('1A := ', day_1a())
     print('1B := ', day_1b())
@@ -163,3 +196,4 @@ if __name__ == '__main__':
     print('5B := ', day_5b())
     print('6A := ', day_6a())
     print('6B := ', day_6b())
+    print('7A := ', day_7a())
