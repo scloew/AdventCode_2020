@@ -115,7 +115,7 @@ def day_5b():
     taken_seats = set(day_5_seat_helper())
     empty_seats = available_seats - taken_seats
     for i in empty_seats:
-        if i in range(13, 1018) and i-1 in taken_seats and i+1 in taken_seats:
+        if i in range(13, 1018) and i - 1 in taken_seats and i + 1 in taken_seats:
             return i
 
 
@@ -151,8 +151,19 @@ def day_6b():
 
 
 def day_7a():
+    graph = day_7_build_graph()
+    return len(bfs(graph)[0]) - 1
+
+
+def day_7b():
+    graph = day_7_build_graph()
+    return bfs(graph)[1]
+
+
+def day_7_build_graph():
     Edge = namedtuple('Edge', ['weight', 'vertex'])
-    data = fetch_input('day_7.txt').replace('.', '').replace(' no other bags', '').replace('bags', 'bag').split('\n')[:-1]
+    data = fetch_input('day_7.txt').replace('.', '')
+    data = data.replace(' no other bags', '') .replace('bags', 'bag').split('\n')[:-1]
     graph = {}
     for entry in data:
         if entry.count('bag') == 1:
@@ -163,12 +174,13 @@ def day_7a():
             temp = item.split(' ')
             wght, temp_bag = temp[0], ' '.join(temp[1:])
             temp_list = graph.get(temp_bag, [])
-            temp_list.append(Edge(wght, bag))
+            temp_list.append(Edge(int(wght), bag))
             graph[temp_bag] = temp_list
-    return len(bfs(graph))-1
+    return graph
 
 
 def bfs(graph, start_node='shiny gold bag'):
+    count = 1
     new_nodes, observed = [start_node], set()
     while new_nodes:
         temp_nodes = []
@@ -177,10 +189,46 @@ def bfs(graph, start_node='shiny gold bag'):
             if node not in graph.keys():
                 continue
             for wght, vertex in graph[node]:
+                count *= wght
                 if vertex not in observed:
                     temp_nodes.append(vertex)
         new_nodes = temp_nodes
-    return observed
+    return observed, count
+
+
+def day_8a():
+    return day_8_helper()[0]
+
+
+def day_8b():
+    data = fetch_input('day_8.txt').split('\n')[:-1]
+    jmps = [index for index, entry in enumerate(data) if 'jmp' in entry]
+    for jmp in jmps:
+        data[jmp], temp = 'acc 0', data[jmp]
+        acc, success = day_8_helper(data)
+        if success:
+            return acc
+        data[jmp] = temp
+
+
+def day_8_helper(data=None):
+    if data is None:
+        data = fetch_input('day_8.txt').split('\n')[:-1]
+    index, acc = 0, 0
+    observed = set()
+    while index < len(data):
+        if index in observed:
+            return acc, False
+        observed.add(index)
+        cmd, val = data[index].split(' ')
+        if cmd == 'nop':
+            index += 1
+        elif cmd == 'acc':
+            acc += int(val)
+            index += 1
+        elif cmd == 'jmp':
+            index += int(val)
+    return acc, True
 
 
 if __name__ == '__main__':
@@ -197,3 +245,6 @@ if __name__ == '__main__':
     print('6A := ', day_6a())
     print('6B := ', day_6b())
     print('7A := ', day_7a())
+    # print('7B := ', day_7b())
+    print('8A := ', day_8a())
+    print('8B := ', day_8b())
