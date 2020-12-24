@@ -156,7 +156,8 @@ def day_7a():
 
 
 def day_7b():
-    graph = day_7_build_graph()
+    graph = day_7_build_graph_b()
+    # return graph
     return bfs(graph)[1]
 
 
@@ -179,6 +180,25 @@ def day_7_build_graph():
     return graph
 
 
+def day_7_build_graph_b():
+    Edge = namedtuple('Edge', ['weight', 'vertex'])
+    data = fetch_input('day_7.txt').replace('.', '')
+    data = data.replace(' no other bags', '') .replace('bags', 'bag').split('\n')[:-1]
+    graph = {}
+    for entry in data:
+        if entry.count('bag') == 1:
+            continue
+        temp = entry.split(' contain ')
+        bag, content = temp[0], temp[1].split(', ')
+        temp_content = graph.get(bag, [])
+        for item in content:
+            temp = item.split(' ')
+            wght, temp_bag = temp[0], ' '.join(temp[1:])
+            temp_content.append(Edge(int(wght), bag))
+        graph[bag] = temp_content
+    return graph
+
+
 def bfs(graph, start_node='shiny gold bag'):
     count = 1
     new_nodes, observed = [start_node], set()
@@ -196,13 +216,32 @@ def bfs(graph, start_node='shiny gold bag'):
     return observed, count
 
 
+def bfs_7b(graph, start_node='shiny gold bag'):
+    count = 1
+    graph, start_node = 'shiny gold bag'
+    new_nodes, observed = graph[start_node], set()
+    # need to make this recursive to handle wght * count of bag
+    while new_nodes:
+        temp_nodes = []
+        for node in new_nodes:
+            observed.add(node)
+            # if node not in graph.keys():
+            #     continue
+            for wght, vertex in graph[node]:
+                count += wght * bfs_7b(graph, vertex)
+                if vertex not in observed:
+                    temp_nodes.append(vertex)
+        new_nodes = temp_nodes
+    return count
+
+
 def day_8a():
     return day_8_helper()[0]
 
 
 def day_8b():
     data = fetch_input('day_8.txt').split('\n')[:-1]
-    jmps = [index for index, entry in enumerate(data) if 'jmp' in entry]
+    jmps = [index for index, entry in enumerate(data) if 'jmp' in entry and '-' in entry]
     for jmp in jmps:
         data[jmp], temp = 'acc 0', data[jmp]
         acc, success = day_8_helper(data)
@@ -231,6 +270,35 @@ def day_8_helper(data=None):
     return acc, True
 
 
+def day_9a():
+    data = [int(i) for i in fetch_input('day_9.txt').split('\n')[:-1]]
+    index, offset, previous = 25, 25, set(data[:25])
+    while index < len(data):
+        current = data[index]
+        if not day_1a(target=current, data=data):
+            return current
+        previous.remove(data[index-offset])
+        previous.add(current)
+        index += 1
+
+
+def day_9b():
+    data = [int(i) for i in fetch_input('day_9.txt').split('\n')[:-1]]
+    target = day_9a()
+    start, stop = 0, 1
+    temp = sum(data[:2])
+    while stop < len(data):
+        if temp == target:
+            stop += 1
+            return max(data[start:stop]) + min(data[start:stop])
+        elif target < temp:
+            temp -= data[start]
+            start += 1
+            continue
+        stop += 1
+        temp += data[stop]
+
+
 if __name__ == '__main__':
     print('1A := ', day_1a())
     print('1B := ', day_1b())
@@ -245,6 +313,8 @@ if __name__ == '__main__':
     print('6A := ', day_6a())
     print('6B := ', day_6b())
     print('7A := ', day_7a())
-    # print('7B := ', day_7b())
+    print('7B := ', day_7b())
     print('8A := ', day_8a())
     print('8B := ', day_8b())
+    print('9A := ', day_9a())
+    print('9B := ', day_9b())
