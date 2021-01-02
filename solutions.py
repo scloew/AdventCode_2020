@@ -1,7 +1,7 @@
 from collections import namedtuple
 from operator import mul
 from functools import reduce
-from collections import Counter
+from collections import Counter, OrderedDict
 
 
 def fetch_input(file_name):
@@ -299,6 +299,36 @@ def day_9b():
         temp += data[stop]
 
 
+def day_10a():
+    data = sorted((int(i) for i in fetch_input('day_10.txt').split('\n')[:-1]))
+    last, one_skip, three_skip = data[0], 1, 1
+    for i in range(1, len(data)):
+        if data[i] - last == 1:
+            one_skip += 1
+        elif data[i] - last == 3:
+            three_skip += 1
+        last = data[i]
+    return one_skip * three_skip
+
+
+def day_10b():
+    data = sorted((int(i) for i in fetch_input('day_10.txt').split('\n')[:-1]))
+    data = [0] + data + [data[-1] + 3]
+    graph = OrderedDict([(x, {y for y in range(x+1, x+4) if y in data}) for x in data])
+    return day_10b_helper(graph, 0)
+
+
+def day_10b_helper(graph, v, map_=None):
+    map_ = {} if map_ is None else map_
+    if v in map_:
+        return map_[v]
+    elif graph[v]:
+        map_[v] = sum(day_10b_helper(graph, x, map_) for x in graph[v])
+        return map_[v]
+    else:
+        return 1
+
+
 if __name__ == '__main__':
     print('1A := ', day_1a())
     print('1B := ', day_1b())
@@ -318,3 +348,5 @@ if __name__ == '__main__':
     print('8B := ', day_8b())
     print('9A := ', day_9a())
     print('9B := ', day_9b())
+    print('10A := ', day_10a())
+    print('10B := ', day_10b()) # 198428693313536 is too low
