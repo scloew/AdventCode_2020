@@ -301,14 +301,8 @@ def day_9b():
 
 def day_10a():
     data = sorted((int(i) for i in fetch_input('day_10.txt').split('\n')[:-1]))
-    last, one_skip, three_skip = data[0], 1, 1
-    for i in range(1, len(data)):
-        if data[i] - last == 1:
-            one_skip += 1
-        elif data[i] - last == 3:
-            three_skip += 1
-        last = data[i]
-    return one_skip * three_skip
+    counter = Counter((data[i+1]-v for i, v in enumerate(data) if i < len(data)-1))
+    return (counter[1]+1) * (counter[3]+1)
 
 
 def day_10b():
@@ -327,6 +321,51 @@ def day_10b_helper(graph, v, map_=None):
         return map_[v]
     else:
         return 1
+
+
+def day_11a():
+    from copy import copy
+    data = [list(i) for i in fetch_input('day_11_test.txt').split('\n')[:-1]]
+    altered = True
+    count = 0
+    while altered:
+        count += 1
+        print(count)
+        print('\n'.join([''.join(i) for i in data]))
+        print('\n=======\n')
+        new_data = copy(data)
+        altered = False
+        for row_num, row in enumerate(data):
+            for seat_num, seat in enumerate(row):
+                # TODO currently modifying data which results in some seats not being vacated when they should be
+                altered |= day_11a_helper(seat, row_num, seat_num, data, new_data)
+        data = new_data
+        if 7 < count:
+            break
+    return 'neat'
+
+
+def day_11a_helper(seat, row, col, data, new_data):
+    # from copy import copy
+    # temp = copy(data)
+    empty, occupied = 'L', '#'
+    directions = ((y, x) for x in range(-1, 2) for y in range(-1, 2) if not x == y == 0)
+    if seat == empty:
+        new_data[row][col] = occupied
+        return True
+    elif seat == occupied:
+        count = 0
+        for y, x in directions:
+            try:
+                if data[row+y][col+x] == occupied and 0 <= min(row+y, col+x):
+                    count += 1
+            except IndexError:
+                pass
+        if 4 <= count:
+            new_data[row][col] = empty
+            return True
+    # data = temp
+    return False
 
 
 if __name__ == '__main__':
@@ -349,4 +388,5 @@ if __name__ == '__main__':
     print('9A := ', day_9a())
     print('9B := ', day_9b())
     print('10A := ', day_10a())
-    print('10B := ', day_10b()) # 198428693313536 is too low
+    print('10B := ', day_10b())
+    print('11A := ', day_11a())
