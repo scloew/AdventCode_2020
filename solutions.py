@@ -368,6 +368,21 @@ def day_11a_helper(seat, row, col, data, new_data):
     return False
 
 
+def day_12a():
+    facing_index = 0
+    shifters, directions = {'R': 1, 'L': -1}, ['E', 'S', 'W', 'N']
+    mags = dict(zip(directions, [0 for _ in range(5)]))
+    data = ((i[0], int(i[1:])) for i in fetch_input('day_12.txt').split('\n')[:-1])
+    for direction, val in data:
+        if direction in ('R', 'L'):
+            facing_index = (facing_index+(val//90) * shifters[direction]) % len(directions)
+        elif direction == 'F':
+            mags[directions[facing_index]] += val
+        else:
+            mags[direction] += val
+    return abs(mags['E'] - mags['W']) + abs(mags['N']-mags['S'])
+
+
 if __name__ == '__main__':
     print('1A := ', day_1a())
     print('1B := ', day_1b())
@@ -390,3 +405,4 @@ if __name__ == '__main__':
     print('10A := ', day_10a())
     print('10B := ', day_10b())
     print('11A := ', day_11a())
+    print('12A := ', day_12a())
