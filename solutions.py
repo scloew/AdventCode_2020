@@ -325,7 +325,7 @@ def day_10b_helper(graph, v, map_=None):
 
 def day_11a():
     from copy import copy
-    data = [list(i) for i in fetch_input('day_11_test.txt').split('\n')[:-1]]
+    data = [list(i) for i in fetch_input('day_11.txt').split('\n')[:-1]]
     altered = True
     count = 0
     while altered:
@@ -373,14 +373,36 @@ def day_12a():
     shifters, directions = {'R': 1, 'L': -1}, ['E', 'S', 'W', 'N']
     mags = dict(zip(directions, [0 for _ in range(5)]))
     data = ((i[0], int(i[1:])) for i in fetch_input('day_12.txt').split('\n')[:-1])
-    for direction, val in data:
-        if direction in ('R', 'L'):
-            facing_index = (facing_index+(val//90) * shifters[direction]) % len(directions)
-        elif direction == 'F':
+    for dir_, val in data:
+        if dir_ in ('R', 'L'):
+            facing_index = (facing_index+(val//90) * shifters[dir_]) % len(directions)
+        elif dir_ == 'F':
             mags[directions[facing_index]] += val
         else:
-            mags[direction] += val
+            mags[dir_] += val
     return abs(mags['E'] - mags['W']) + abs(mags['N']-mags['S'])
+
+
+# not working yet
+def day_12b():
+    dirs = {'N': 1, 'E': 1, 'S': -1, 'W': -1}
+    ship_x, ship_y = 0, 0
+    wp_x, wp_y = 10, 1
+    for dir_, val in ((i[0], int(i[1:])) for i in fetch_input('day_12b_test.txt').split('\n')[:-1]):
+        if dir_ in ('R', 'L'):
+            for _ in range(val//90):
+                if dir_ == 'R':
+                    wp_x, wp_y = wp_y, -wp_x
+                else:
+                    wp_x, wp_y = -wp_y, wp_x
+        elif dir_ == 'F':
+            ship_x += val * wp_x
+            ship_y += val * wp_y
+        elif dir_ in ('N', 'S'):
+            wp_y += val * dirs[dir_]
+        else:
+            wp_x = val * dirs[dir_]
+    return abs(ship_x) + abs(ship_y)
 
 
 if __name__ == '__main__':
@@ -406,3 +428,4 @@ if __name__ == '__main__':
     print('10B := ', day_10b())
     print('11A := ', day_11a())
     print('12A := ', day_12a())
+    print('12B := ', day_12b())
