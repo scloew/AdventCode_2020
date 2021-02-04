@@ -405,6 +405,24 @@ def day_12b():
     return abs(ship_x) + abs(ship_y)
 
 
+def day_22a():
+    data = fetch_input('day22.txt').split('\n\n')
+    p1, p2 = [int(i) for i in data[0].split('\n')[1:]], [int(i) for i in data[1].split('\n')[1:-1]]
+    while p1 and p2:
+        c1, c2 = p1.pop(0), p2.pop(0)
+        if c1 > c2:
+            p1.append(c1)
+            p1.append(c2)
+        else:
+            p2.append(c2)
+            p2.append(c1)
+    winner = p1 if p1 else p2
+    total = 0
+    for i, v in enumerate(winner[::-1]):
+        total += (i+1) * v
+    return total
+
+
 if __name__ == '__main__':
     print('1A := ', day_1a())
     print('1B := ', day_1b())
@@ -429,3 +447,4 @@ if __name__ == '__main__':
     print('11A := ', day_11a())
     print('12A := ', day_12a())
     print('12B := ', day_12b())
+    print('22A := ', day_22a())
